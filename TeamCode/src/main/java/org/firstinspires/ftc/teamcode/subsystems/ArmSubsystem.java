@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode.util.BotState;
 import org.firstinspires.ftc.teamcode.util.Util;
 
 public class ArmSubsystem extends SubsystemBase {
-    private BotState currentState;
+    private BotState currentState = BotState.HOME;
     //Extension objects
     private final MotorEx lExtend, rExtend;
     private final MotorGroup extension;

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.util;
 
 import androidx.annotation.Nullable;
 
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
@@ -20,7 +21,7 @@ public class Util {
             @Nullable Motor.RunMode runMode,
             @Nullable double[] vK
             ) {
-        MotorEx m = hMap.get(MotorEx.class, name);
+        MotorEx m = new MotorEx(hMap, name);
         m.setZeroPowerBehavior(zeroPowerBehavior != null ? zeroPowerBehavior : Motor.ZeroPowerBehavior.FLOAT);
         m.setInverted(isInverted != null && isInverted.getAsBoolean());
         m.setRunMode(runMode != null ? runMode : Motor.RunMode.RawPower);

@@ -5,12 +5,15 @@ import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.ConditionalCommand;
 import com.seattlesolvers.solverslib.command.DeferredCommand;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.PerpetualCommand;
+import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.button.Button;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.teamcode.commands.DefaultDrive;
 import org.firstinspires.ftc.teamcode.subsystems.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.SampleClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
@@ -43,6 +46,9 @@ public class MainCommandOpMode extends CommandOpMode {
             bClawsControl;
     private Trigger bIntake;
 
+    private DefaultDrive m_driveCommand;
+
+
     @Override
     public void initialize() {
         arm = new ArmSubsystem(hardwareMap);
@@ -55,12 +61,12 @@ public class MainCommandOpMode extends CommandOpMode {
 
         configureButtonBindings();
 
-        drive.setDefaultCommand(new InstantCommand(() -> drive.driveRobotRelative(driver.getLeftX(), driver.getLeftY(), driver.getRightX())));
+        m_driveCommand = new DefaultDrive(drive, () -> driver.getLeftY(), () -> driver.getLeftX(), () -> driver.getRightX());
 
-        schedule();
-        register(arm, sampleClaw, drive, specimenClaw);
+
+        register(drive);
+        drive.setDefaultCommand(m_driveCommand);
     }
-
 
     /**
 
