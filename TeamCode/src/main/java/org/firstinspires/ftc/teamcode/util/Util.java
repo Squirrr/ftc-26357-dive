@@ -8,6 +8,7 @@ import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
+import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 
 import java.util.function.BooleanSupplier;
 
@@ -19,16 +20,33 @@ public class Util {
             @Nullable Motor.ZeroPowerBehavior zeroPowerBehavior,
             @Nullable BooleanSupplier isInverted,
             @Nullable Motor.RunMode runMode,
-            @Nullable double[] vK
+            @Nullable double[] pidConstants
             ) {
         MotorEx m = new MotorEx(hMap, name);
         m.setZeroPowerBehavior(zeroPowerBehavior != null ? zeroPowerBehavior : Motor.ZeroPowerBehavior.FLOAT);
         m.setInverted(isInverted != null && isInverted.getAsBoolean());
         m.setRunMode(runMode != null ? runMode : Motor.RunMode.RawPower);
-        boolean veloNull = vK != null;
-        m.setVeloCoefficients(veloNull ? vK[0] : 0.0, veloNull ? vK[1] : 0.0, veloNull ? vK[2] : 0.0);
+        boolean veloNull = pidConstants != null;
+        m.setVeloCoefficients(veloNull ? pidConstants[0] : 0.0, veloNull ? pidConstants[1] : 0.0, veloNull ? pidConstants[2] : 0.0);
+        m.setPositionCoefficient(veloNull ? pidConstants[0]: 0.0);
 
         return m;
+    }
+
+    public static void setPositionPower(MotorEx m) {
+        if (m.atTargetPosition()) {
+            m.set(0.5);
+        } else {
+            m.set(1.0);
+        }
+    }
+
+    public static void setPositionPower(MotorGroup m) {
+        if (m.atTargetPosition()) {
+            m.set(0.5);
+        } else {
+            m.set(1.0);
+        }
     }
 
     public static double average(double[] nums) {

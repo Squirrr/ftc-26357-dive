@@ -8,7 +8,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
+import com.seattlesolvers.solverslib.hardware.ServoEx;
+import com.seattlesolvers.solverslib.hardware.SimpleServo;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 
@@ -19,14 +22,12 @@ public class ArmSubsystem extends SubsystemBase {
     private BotState currentState = BotState.HOME;
     //Extension objects
     private final MotorEx lExtend, rExtend;
-    private final MotorGroup extension;
-
     //Shoulder objects
     private final MotorEx shoulder;
     private boolean shoulderFirst;
 
     //Arm objects
-    private final ServoImplEx elbow;
+    private final ServoEx elbow;
 
     public ArmSubsystem(HardwareMap hMap) {
         lExtend = Util.initializeMotor(hMap,
@@ -41,9 +42,7 @@ public class ArmSubsystem extends SubsystemBase {
                 () -> RIGHT_EXTEND_IS_INVERTED,
                 RIGHT_EXTEND_RUN_MODE,
                 new double[] {EXTENSION_kP, EXTENSION_kI, EXTENSION_kD});
-
-        extension = new MotorGroup(lExtend, rExtend);
-
+        
         shoulder = Util.initializeMotor(hMap,
                 SHOULDER_MOTOR_NAME,
                 SHOULDER_ZPB,
@@ -52,7 +51,7 @@ public class ArmSubsystem extends SubsystemBase {
                 new double[] {SHOULDER_kP, SHOULDER_kI, SHOULDER_kD}
         );
 
-        elbow = hMap.get(ServoImplEx.class, ELBOW_SERVO_NAME);
+        elbow = new SimpleServo(hMap, ELBOW_SERVO_NAME, 0, 180);
     }
 
     @Override
@@ -62,16 +61,23 @@ public class ArmSubsystem extends SubsystemBase {
             elbow.setPosition(currentState.getElbowSetpoint());
 
             if (shoulderIsAtSetpoint()) {
-                extension.setTargetPosition(currentState.getExtensionSetpoint());
+                lExtend.setTargetPosition(currentState.getExtensionSetpoint());
+                rExtend.setTargetPosition(currentState.getExtensionSetpoint());
             }
         } else {
-            extension.setTargetPosition(currentState.getExtensionSetpoint());
+            lExtend.setTargetPosition(currentState.getExtensionSetpoint());
+            rExtend.setTargetPosition(currentState.getExtensionSetpoint());
 
             if (extensionIsAtSetpoint()) {
                 shoulder.setTargetPosition(currentState.getShoulderSetpoint());
                 elbow.setPosition(currentState.getElbowSetpoint());
             }
         }
+
+        Util.setPositionPower(shoulder);
+        Util.setPositionPower(lExtend);
+        Util.setPositionPower(rExtend);
+
     }
 
     public boolean setShoulderFirst(boolean shoulderFirst) {

@@ -15,24 +15,23 @@ public class Constants {
             public static final Motor.RunMode SHOULDER_RUN_MODE = Motor.RunMode.PositionControl;
             public static final Motor.ZeroPowerBehavior SHOULDER_ZPB = Motor.ZeroPowerBehavior.BRAKE;
 
-            public static final double SHOULDER_kP = 0.0;
+            public static final double SHOULDER_kP = 0.01;
             public static final double SHOULDER_kI = 0.0;
             public static final double SHOULDER_kD = 0.0;
-            public static final double PIVOT_kFF = 0.0;
         }
 
         public static class ExtensionConstants {
             public static final String LEFT_EXTEND_NAME = "leftLift";
-            public static final boolean LEFT_EXTEND_IS_INVERTED = true;
+            public static final boolean LEFT_EXTEND_IS_INVERTED = false;
             public static final Motor.RunMode LEFT_EXTEND_RUN_MODE = Motor.RunMode.PositionControl;
             public static final Motor.ZeroPowerBehavior LEFT_EXTEND_ZPB = Motor.ZeroPowerBehavior.BRAKE;
 
             public static final String RIGHT_EXTEND_MOTOR_NAME = "rightLift";
-            public static final boolean RIGHT_EXTEND_IS_INVERTED = false;
+            public static final boolean RIGHT_EXTEND_IS_INVERTED = true;
             public static final Motor.RunMode RIGHT_EXTEND_RUN_MODE = Motor.RunMode.PositionControl;
             public static final Motor.ZeroPowerBehavior RIGHT_EXTEND_ZPB = Motor.ZeroPowerBehavior.BRAKE;
 
-            public static final double EXTENSION_kP = 0.0;
+            public static final double EXTENSION_kP = 0.0075;
             public static final double EXTENSION_kI = 0.0;
             public static final double EXTENSION_kD = 0.0;
             public static final double EXTENSION_kFF = 0.0;
