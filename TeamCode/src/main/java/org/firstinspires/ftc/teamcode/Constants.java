@@ -4,6 +4,8 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor;
 
 public class Constants {
 
+    public static final double STALL_CURRENT_AMPS = 9.0;
+
     public static class DriveConstants {}
 
     public static class ArmConstants {
@@ -48,7 +50,7 @@ public class Constants {
     public static class SampleClawConstants {
         public static final String SAMPLE_CLAW_SERVO_NAME = "intake";
         public static final double CLAW_OPEN_CLAW_POS = 1.0;
-        public static final double CLAW_CLOSED_CLAW_POS = 0.0;
+        public static final double CLAW_CLOSED_CLAW_POS = 0.7;
         public static final String SAMPLE_WRIST_SERVO_NAME = "intakeRotate";
     }
 }

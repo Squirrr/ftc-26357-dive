@@ -5,8 +5,6 @@ import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.ConditionalCommand;
 import com.seattlesolvers.solverslib.command.DeferredCommand;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.PerpetualCommand;
-import com.seattlesolvers.solverslib.command.RunCommand;
 import com.seattlesolvers.solverslib.command.button.Button;
 import com.seattlesolvers.solverslib.command.button.GamepadButton;
 import com.seattlesolvers.solverslib.command.button.Trigger;
@@ -18,12 +16,14 @@ import org.firstinspires.ftc.teamcode.subsystems.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.SampleClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.SpecimenClawSubsystem;
-import org.firstinspires.ftc.teamcode.util.BotState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+
+import static org.firstinspires.ftc.teamcode.util.BotState.*;
+import static com.seattlesolvers.solverslib.gamepad.GamepadKeys.Button.*;
+
 
 @TeleOp(group = "Learning", name = "dev-commandopmode")
 public class MainCommandOpMode extends CommandOpMode {
@@ -38,20 +38,27 @@ public class MainCommandOpMode extends CommandOpMode {
     private GamepadEx operator;
 
     //Initialize triggers here
+    @SuppressWarnings({"UnusedDeclaration", "FieldCanBeLocal"})
     private Button bHome,
             bBuckets,
             bChambers,
             bSpecimenPickup,
             bClimb,
-            bClawsControl;
+            bClawsControl,
+            bWristControlCW,
+            bWristControlCCW,
+            bResetSlides;
+
+    @SuppressWarnings({"UnusedDeclaration", "FieldCanBeLocal"})
     private Trigger bIntake;
 
+    @SuppressWarnings({"UnusedDeclaration", "FieldCanBeLocal"})
     private DefaultDrive m_driveCommand;
 
 
     @Override
     public void initialize() {
-        arm = new ArmSubsystem(hardwareMap);
+        arm = new ArmSubsystem(hardwareMap, this.telemetry);
         sampleClaw = new SampleClawSubsystem(hardwareMap);
         drive = new DriveSubsystem(hardwareMap);
         specimenClaw = new SpecimenClawSubsystem(hardwareMap);
@@ -107,65 +114,66 @@ public class MainCommandOpMode extends CommandOpMode {
 
      */
     public void configureButtonBindings() {
-        bHome = new GamepadButton(driver, GamepadKeys.Button.CROSS)
-                .whenPressed(arm.setGoalCommand(BotState.HOME));
+        bHome = new GamepadButton(driver, CROSS)
+                .whenPressed(arm.setGoalCommand(HOME));
 
         bIntake = new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1)
-                .whileActiveContinuous(new DeferredCommand(() -> new ConditionalCommand(
-                        new ConditionalCommand(
-                                arm.setGoalCommand(BotState.INTAKE_CLOSE),
-                                arm.setGoalCommand(BotState.INTAKE_FAR),
-                                () -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) < 0.7),
-                        arm.setGoalCommand(BotState.PICKUP_SPEC),
-                        () -> !driver.getButton(GamepadKeys.Button.LEFT_BUMPER)
-                ),
-                        new ArrayList<>(Collections.singletonList(arm))
-                ))
-                .toggleWhenActive(new DeferredCommand(
-                        () -> new ConditionalCommand(
-                                new InstantCommand(specimenClaw::openClaw),
-                                new InstantCommand(sampleClaw::openClaw),
-                                () -> driver.getButton(GamepadKeys.Button.LEFT_BUMPER)
-
-                        ), new ArrayList<>(Arrays.asList(sampleClaw, specimenClaw))
+                .whileActiveContinuous(new ConditionalCommand(
+                        new DeferredCommand(() -> new ConditionalCommand(
+                                new ConditionalCommand(
+                                        arm.setGoalCommand(INTAKE_CLOSE),
+                                        arm.setGoalCommand(INTAKE_FAR),
+                                        () -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) < 0.7),
+                                arm.setGoalCommand(PICKUP_SPEC),
+                                () -> !driver.getButton(LEFT_BUMPER)
+                        ),
+                                new ArrayList<>(Collections.singletonList(arm))),
+                        arm.setGoalCommand(PRE_INTAKE),
+                        () -> arm.getCurrentState() == PRE_INTAKE
                 ));
 
-        bClawsControl = new GamepadButton(driver, GamepadKeys.Button.RIGHT_BUMPER)
+        bClawsControl = new GamepadButton(driver, RIGHT_BUMPER)
                 .toggleWhenPressed(new DeferredCommand(
                         () -> new ConditionalCommand(
                                 new InstantCommand(specimenClaw::openClaw),
                                 new InstantCommand(sampleClaw::openClaw),
-                                        () -> driver.getButton(GamepadKeys.Button.LEFT_BUMPER)
+                                        () -> driver.getButton(LEFT_BUMPER)
                         ), new ArrayList<>(Arrays.asList(specimenClaw, sampleClaw))),
 
                         new DeferredCommand(
                                 () -> new ConditionalCommand(
                                         new InstantCommand(specimenClaw::closeClaw),
                                         new InstantCommand(sampleClaw::closeClaw),
-                                        () -> driver.getButton(GamepadKeys.Button.LEFT_BUMPER)
+                                        () -> driver.getButton(LEFT_BUMPER)
                                 ), new ArrayList<>(Arrays.asList(specimenClaw, sampleClaw))));
 
-
-
-        bBuckets = new GamepadButton(driver, GamepadKeys.Button.SQUARE)
+        bBuckets = new GamepadButton(driver, SQUARE)
                 .whenPressed(new DeferredCommand(() -> new ConditionalCommand(
-                        arm.setGoalCommand(BotState.LOWBUCKET),
-                        arm.setGoalCommand(BotState.HIGHBUCKET),
-                        () -> driver.getButton(GamepadKeys.Button.LEFT_BUMPER)
+                        arm.setGoalCommand(LOWBUCKET),
+                        arm.setGoalCommand(HIGHBUCKET),
+                        () -> driver.getButton(LEFT_BUMPER)
                 ), new ArrayList<>(Collections.singletonList(arm))));
 
-        bChambers = new GamepadButton(driver, GamepadKeys.Button.CIRCLE)
+        bChambers = new GamepadButton(driver, CIRCLE)
                 .whenPressed(new DeferredCommand(() -> new ConditionalCommand(
-                        arm.setGoalCommand(BotState.LOWCHAMBER),
-                        arm.setGoalCommand(BotState.HIGHCHAMBER),
-                        () -> driver.getButton(GamepadKeys.Button.LEFT_BUMPER)
+                        arm.setGoalCommand(LOWCHAMBER),
+                        arm.setGoalCommand(HIGHCHAMBER),
+                        () -> driver.getButton(LEFT_BUMPER)
                 ), new ArrayList<>(Collections.singletonList(arm))));
 
-        bClimb = new GamepadButton(driver, GamepadKeys.Button.TRIANGLE)
+        bClimb = new GamepadButton(driver, TRIANGLE)
                 .whenPressed(new DeferredCommand(() -> new ConditionalCommand(
-                        arm.setGoalCommand(BotState.CLIMB),
-                        arm.setGoalCommand(BotState.PREP_CLIMB),
-                        () -> driver.getButton(GamepadKeys.Button.LEFT_BUMPER)
+                        arm.setGoalCommand(CLIMB),
+                        arm.setGoalCommand(PREP_CLIMB),
+                        () -> driver.getButton(LEFT_BUMPER)
                 ), new ArrayList<>(Collections.singletonList(arm))));
+
+        bWristControlCW = new GamepadButton(driver, DPAD_LEFT)
+                .whileHeld(new InstantCommand(() -> sampleClaw.stepWrist(true)));
+
+        bWristControlCCW = new GamepadButton(driver, DPAD_RIGHT)
+                .whileHeld(new InstantCommand(() -> sampleClaw.stepWrist(false)));
+
+        bResetSlides = new GamepadButton(driver, SHARE).whileHeld(arm::resetSlides);
     }
 }

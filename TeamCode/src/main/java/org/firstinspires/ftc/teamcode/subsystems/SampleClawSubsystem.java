@@ -6,6 +6,8 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import static org.firstinspires.ftc.teamcode.Constants.SampleClawConstants.*;
 
+import org.firstinspires.ftc.teamcode.util.MathUtil;
+
 public class SampleClawSubsystem extends SubsystemBase {
     /**
      * Creates a new SpecimenClawSubsystem.
@@ -29,6 +31,10 @@ public class SampleClawSubsystem extends SubsystemBase {
         sampleClaw.setPosition(CLAW_CLOSED_CLAW_POS);
     }
     public void setWrist(double pos) {
-        sampleWrist.setPosition(pos);}
+        sampleWrist.setPosition(MathUtil.clamp(pos, 0.0, 0.418));
+    }
+    public void stepWrist(boolean CW) {
+        setWrist(sampleWrist.getPosition() + 0.005 * (CW ? 1 : -1));
+    }
 
 }

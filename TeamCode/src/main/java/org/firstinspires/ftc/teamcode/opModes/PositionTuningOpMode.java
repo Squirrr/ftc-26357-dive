@@ -43,6 +43,7 @@ import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.hardware.motors.MotorGroup;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.util.MotorUtil;
 import org.firstinspires.ftc.teamcode.util.Util;
 /*
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -120,9 +121,9 @@ public class PositionTuningOpMode extends OpMode
 
         updateMotorPositions();
         updateServoPositions();
-        Util.setPositionPower(leftLift);
-        Util.setPositionPower(rightLift);
-        Util.setPositionPower(pivot);
+        MotorUtil.setPositionPower(leftLift);
+        MotorUtil.setPositionPower(rightLift);
+        MotorUtil.setPositionPower(pivot);
         // Show the elapsed game time and wheel power.
         sendAllTelemetry();
         mTelemetry.update();
